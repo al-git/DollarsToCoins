@@ -3,20 +3,25 @@ import random
 
 # Define coin names and value associations
 divisions = dict(
-Pennies = .01,
-Nickels = .05,
-Dimes = .1,
-Quarters = .25
+Penny = .01,
+Nickel = .05,
+Dime = .1,
+Quarter = .25
 )
 
 # Get coin names and values for later use
 coins = list(divisions.keys())
 values = list(divisions.values())
 
-# Convert singularWord to plural if num > 1
+# Convert singularWord to plural if num implies plurality
 def pluralCheck(num, singularWord):
-    if (float(num) > 1):
-        return singularWord + 's'
+    singularValues = [-1, -.1, .1, 1]
+    if (float(num) not in singularValues):
+        # Catch spelling differences for penny vs pennies
+        if 'penny' in singularWord.lower():
+            return 'pennies'
+        else:
+            return singularWord + 's'
     else:
         return singularWord
 
@@ -41,19 +46,18 @@ def ask():
     dollars = input()
 
     # Print 'dollars' equivalent in each coin subdivision
-    try:
-        float(dollars)
+    if (float(dollars) >= 0): # FIXME: Needs an error handler
         narrate('With ' + str(dollars) + ' ' + pluralCheck(dollars, 'dollar')
         + ', you have: ')
         for i in range(len(coins)):
-            narrate(str(float(dollars) / float(values[i])) + ' '
-            + coins[i].lower())
-            pass
-            # FIXME: Erroneous dollars value persists after successful input
-    except Exception as e:
+            narrate(str(float(dollars) / values[i]) + ' '
+            + pluralCheck(float(dollars) / values[i], coins[i].lower())
+            )
+        # FIXME: Erroneous dollars value persists after successful input
+        replay()
+    else:
         tryAgain()
         ask()
-        raise
 
 def replay():
     narrate(
@@ -61,10 +65,10 @@ def replay():
     '1. Yes',
     '2. No'
     )
-    prompt = int(input())
-    if (prompt == 1):
+    prompt = input()
+    if (prompt == '1'):
         play('Wonderful')
-    elif (prompt == 2):
+    elif (prompt == '2'):
         narrate('Very well, thank you for playing')
         exit()
     else:
@@ -73,8 +77,7 @@ def replay():
 
 def tryAgain():
     narrate('Sorry, I don\'t understand.',
-    'Please enter a number')
+    'Please enter a valid number')
 
 play('Hello')
-# FIXME: Replay only replays once. Wrap play() and replay() for many replay()'s
 replay()
