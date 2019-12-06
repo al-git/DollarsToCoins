@@ -1,5 +1,6 @@
 import time
 import random
+import itertools
 
 # Define coin names and value associations
 divisions = dict(
@@ -9,9 +10,11 @@ Dime = .1,
 Quarter = .25
 )
 
+
 # Get coin names and values for later use
 coins = list(divisions.keys())
 values = list(divisions.values())
+
 
 # Convert singularWord to plural if num implies plurality
 def pluralCheck(num, singularWord):
@@ -25,11 +28,13 @@ def pluralCheck(num, singularWord):
     else:
         return singularWord
 
+
 # Prints given list of lines with a short pause between each
 def narrate(*script):
     for i in range(len(script)):
         print(script[i])
         time.sleep(1)
+
 
 # Greet and prompt user
 def play(salutation):
@@ -45,20 +50,26 @@ def ask():
     # Store user-input
     dollars = input()
 
-    # Print 'dollars' equivalent in each coin subdivision
-    if (float(dollars) >= 0): # FIXME: Needs an error handler
+    # Check for int(dollars). Catch errors.
+    try:
+        float(dollars)
+    except Exception as e:
+        tryAgain()
+        ask()
+    else:
         narrate('With ' + str(dollars) + ' ' + pluralCheck(dollars, 'dollar')
         + ', you have: ')
+        # Print 'dollars' equivalent in each coin subdivision
+        # FIXME: Remove unnecessary decimal 0' and include commas where
+        # applicable.
         for i in range(len(coins)):
             narrate(str(float(dollars) / values[i]) + ' '
             + pluralCheck(float(dollars) / values[i], coins[i].lower())
             )
-        # FIXME: Erroneous dollars value persists after successful input
         replay()
-    else:
-        tryAgain()
-        ask()
 
+
+# Prompt for replay or quit
 def replay():
     narrate(
     'Would you like to convert another dollar amount?',
@@ -75,9 +86,11 @@ def replay():
         tryAgain()
         replay()
 
+# Catch for invalid answers
 def tryAgain():
     narrate('Sorry, I don\'t understand.',
     'Please enter a valid number')
 
+# Run game
 play('Hello')
 replay()
